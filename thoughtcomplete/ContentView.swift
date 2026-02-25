@@ -31,7 +31,12 @@ struct ContentView: View {
         } detail: {
             ZStack(alignment: .topLeading) {
                 VStack(spacing: 0) {
-                    EditorView(text: $text, font: selectedFont.font(size: currentFontSize))
+                    EditorView(
+                        text: $text,
+                        writingFont: selectedFont,
+                        fontSize: currentFontSize,
+                        completionService: appState.completionService
+                    )
 
                     Divider().opacity(0.15)
 
@@ -43,20 +48,23 @@ struct ContentView: View {
                         timerLabel: timerLabel,
                         timerRunning: timerRunning,
                         timerStarted: timerStarted,
+                        hasText: !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                         onCycleFont:      { selectedFont = selectedFont.next },
                         onCycleFontSize:  { appState.fontSizeIndex = (appState.fontSizeIndex + 1) % fontSizes.count },
                         onSave:           { saveThought() },
+                        onClear:          { clearEditor() },
                         onToggleSidebar:  { toggleSidebar() },
                         onCycleTimer:     { cycleTimer() },
                         onToggleTimer:    { toggleTimer() }
                     )
-                    .opacity(text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 1 : 1) // save dimmed separately below
                 }
                 .background(Color(NSColor.textBackgroundColor))
 
                 if let thought = selectedThought {
                     ThoughtDetailOverlay(thought: thought) {
                         withAnimation(.spring(duration: 0.25)) { selectedThought = nil }
+                    } onEdit: {
+                        editThought(thought)
                     }
                     .padding(.top, 20)
                     .padding(.leading, 20)
@@ -69,16 +77,10 @@ struct ContentView: View {
         }
         .navigationSplitViewStyle(.balanced)
         .frame(minWidth: 600, minHeight: 400)
-        .onKeyPress("s", phases: .down) { press in
-            guard press.modifiers.contains(.command) else { return .ignored }
-            saveThought()
-            return .handled
-        }
-        .onKeyPress("b", phases: .down) { press in
-            guard press.modifiers.contains(.command) else { return .ignored }
-            toggleSidebar()
-            return .handled
-        }
+        .onReceive(NotificationCenter.default.publisher(for: .saveThought))  { _ in saveThought() }
+        .onReceive(NotificationCenter.default.publisher(for: .clearEditor))  { _ in clearEditor() }
+        .onReceive(NotificationCenter.default.publisher(for: .toggleSidebar)) { _ in toggleSidebar() }
+        .onReceive(NotificationCenter.default.publisher(for: .cycleFont))    { _ in selectedFont = selectedFont.next }
     }
 
     // MARK: - Sidebar
@@ -95,6 +97,19 @@ struct ContentView: View {
     }
 
     // MARK: - Editor
+
+    private func clearEditor() {
+        text = ""
+    }
+
+    private func editThought(_ thought: Thought) {
+        text = thought.text
+        appState.store.delete(thought)
+        withAnimation(.spring(duration: 0.25)) {
+            selectedThought = nil
+            columnVisibility = .detailOnly
+        }
+    }
 
     private func saveThought() {
         guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }

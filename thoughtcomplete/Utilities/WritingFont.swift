@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 enum WritingFont: CaseIterable {
     case serif, sfPro, sansSerif, mono
@@ -23,6 +24,15 @@ enum WritingFont: CaseIterable {
         case .sfPro:     return .system(size: size, weight: .regular, design: .default)
         case .sansSerif: return .custom("Helvetica Neue", size: size)
         case .mono:      return .system(size: size, weight: .regular, design: .monospaced)
+        }
+    }
+
+    func nsFont(size: CGFloat) -> NSFont {
+        switch self {
+        case .serif:     return NSFont(name: "Georgia", size: size) ?? NSFont.systemFont(ofSize: size)
+        case .sfPro:     return NSFont.systemFont(ofSize: size, weight: .regular)
+        case .sansSerif: return NSFont(name: "Helvetica Neue", size: size) ?? NSFont.systemFont(ofSize: size)
+        case .mono:      return NSFont.monospacedSystemFont(ofSize: size, weight: .regular)
         }
     }
 }

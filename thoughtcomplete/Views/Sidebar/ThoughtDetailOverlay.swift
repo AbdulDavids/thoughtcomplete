@@ -3,6 +3,7 @@ import SwiftUI
 struct ThoughtDetailOverlay: View {
     let thought: Thought
     let onDismiss: () -> Void
+    let onEdit: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -11,6 +12,14 @@ struct ThoughtDetailOverlay: View {
                     .font(.system(size: 11, weight: .regular, design: .monospaced))
                     .foregroundStyle(.secondary)
                 Spacer()
+                Button("Edit") {
+                    onEdit()
+                }
+                .buttonStyle(.plain)
+                .font(.system(size: 12, weight: .medium, design: .monospaced))
+                .foregroundStyle(.secondary)
+                .padding(.trailing, 8)
+
                 Button(action: onDismiss) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 15))

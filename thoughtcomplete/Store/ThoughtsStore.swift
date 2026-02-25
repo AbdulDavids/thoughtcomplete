@@ -22,6 +22,12 @@ class ThoughtsStore {
         persist()
     }
 
+    func update(_ thought: Thought) {
+        guard let index = thoughts.firstIndex(where: { $0.id == thought.id }) else { return }
+        thoughts[index] = thought
+        persist()
+    }
+
     private func persist() {
         guard let data = try? JSONEncoder().encode(thoughts) else { return }
         UserDefaults.standard.set(data, forKey: storageKey)

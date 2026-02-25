@@ -9,10 +9,12 @@ struct BottomBar: View {
     let timerLabel: String
     let timerRunning: Bool
     let timerStarted: Bool
+    let hasText: Bool
 
     let onCycleFont: () -> Void
     let onCycleFontSize: () -> Void
     let onSave: () -> Void
+    let onClear: () -> Void
     let onToggleSidebar: () -> Void
     let onCycleTimer: () -> Void
     let onToggleTimer: () -> Void
@@ -22,10 +24,17 @@ struct BottomBar: View {
             BarButton(label: selectedFont.displayName, action: onCycleFont)
             BarButton(label: "\(Int(fontSizes[fontSizeIndex]))", action: onCycleFontSize)
 
+            if hasText {
+                BarButton(label: "Clear", action: onClear)
+                    .foregroundStyle(.secondary)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+            }
+
             Spacer()
 
             BarButton(label: savedFlash ? "Saved" : "Save", action: onSave)
-                .opacity(savedFlash ? 1 : 1) // opacity controlled by caller via disabled state
+                .opacity(hasText ? 1 : 0.3)
+            BarButton(label: sidebarVisible ? "Hide" : "Thoughts", action: onToggleSidebar)
             BarButton(label: timerLabel, action: onCycleTimer)
             BarButton(
                 label: timerRunning ? "Stop" : (timerStarted ? "Reset" : "Start"),
@@ -35,5 +44,6 @@ struct BottomBar: View {
         .padding(.horizontal, 24)
         .padding(.vertical, 10)
         .background(Color(NSColor.windowBackgroundColor))
+        .animation(.easeInOut(duration: 0.15), value: hasText)
     }
 }
