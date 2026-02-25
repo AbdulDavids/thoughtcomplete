@@ -4,7 +4,11 @@
 
 a writing app i made. enjoy.
 
-distraction-free [freewriting](https://en.wikipedia.org/wiki/Free_writing) for macOS — no popups, no dropdowns, no noise. just you and the page.
+distraction-free [freewriting](https://en.wikipedia.org/wiki/Free_writing) for macOS with no popups, no dropdowns, no noise. just you and the page.
+
+[download here](https://github.com/AbdulDavids/thoughtcomplete/releases/download/v1.3/thoughtcomplete.v1.3.zip)
+
+[source code is free](https://github.com/AbdulDavids/thoughtcomplete/)
 
 ---
 
